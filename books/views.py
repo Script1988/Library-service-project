@@ -1,3 +1,9 @@
-from django.shortcuts import render
+from rest_framework import viewsets, mixins
 
-# Create your views here.
+from books.permissions import IsAdminOrIfAuthenticatedReadOnly
+from books.serializers import BooksSerializer
+
+
+class BooksViewSet(viewsets.ModelViewSet):
+    serializer_class = BooksSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
