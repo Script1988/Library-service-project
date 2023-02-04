@@ -45,3 +45,34 @@ class BorrowingDetailSerializer(ReadSerializer, BorrowingListSerializer):
             "user_id",
             "book_id",
         )
+
+
+class BorrowingCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Borrowing
+        fields = (
+            "borrow_date",
+            "expected_return_date",
+            "user_id",
+            "book_id",
+        )
+
+    def validate(self, attrs):
+        if attrs["book_id"].inventory == 0:
+            raise serializers.ValidationError("Not enough books")
+        attrs["book_id"].inventory = attrs["book_id"].inventory - 1
+        return attrs
+
+    def create(self, validated_data):
+        return Borrowing.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.borrow_date = validated_data.get("borrow_date", instance.borrow_date)
+        instance.expected_return_date = validated_data.get("expected_return_date", instance.expected_return_date)
+        instance.actual_return_date = validated_data.get("actual_return_date", instance.actual_return_date)
+        instance.book_id = validated_data.get("book_id", instance.book_id)
+        instance.user_id = validated_data.get("user_id", instance.user_id)
+        instance.save()
+
+        return instance

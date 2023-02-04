@@ -14,3 +14,12 @@ class Borrowing(models.Model):
     def __str__(self):
         return f"{self.book_id.title}"
 
+    # def validate(self, number_of_books: int = 1):
+    #     if self.book_id.inventory - number_of_books < 0:
+    #         raise f"You can borrow only {number_of_books} book"
+    #     self.book_id.inventory -= number_of_books
+    #     self.save()
+    #
+    # def clean(self):
+    #     Borrowing.validate()
+
