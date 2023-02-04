@@ -59,9 +59,13 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, attrs):
-        if attrs["book_id"].inventory == 0:
+        book = attrs["book_id"]
+        if book.inventory == 0:
             raise serializers.ValidationError("Not enough books")
-        attrs["book_id"].inventory = attrs["book_id"].inventory - 1
+
+        book.inventory = book.inventory - 1
+        book.save()
+
         return attrs
 
     def create(self, validated_data):
