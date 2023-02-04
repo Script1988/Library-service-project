@@ -80,3 +80,14 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class BorrowingReturnSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Borrowing
+        fields = (
+            "borrow_date",
+            "actual_return_date",
+            "user_id",
+            "book_id",
+        )
