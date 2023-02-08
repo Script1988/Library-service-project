@@ -4,7 +4,7 @@ from rest_framework import routers
 from books.views import BooksViewSet
 
 router = routers.DefaultRouter()
-router.register("books", BooksViewSet, basename="list")
+router.register("books", BooksViewSet, basename="books")
 
 urlpatterns = [path("", include(router.urls))]
 
