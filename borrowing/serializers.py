@@ -49,7 +49,6 @@ class BorrowingDetailSerializer(ReadSerializer, BorrowingListSerializer):
 
 
 class BorrowingCreateSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Borrowing
         fields = (
@@ -59,7 +58,19 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
             "book_id",
         )
 
+    def get_count(self):
+        request = self.context.get("request")
+        user_id = request.user.id
+
+        return user_id
+
     def validate(self, attrs):
+        user = attrs["user_id"]
+        request_user = self.get_count()
+
+        if user.id != request_user:
+            raise serializers.ValidationError("You can not create borrowings for another users")
+
         book = attrs["book_id"]
         if book.inventory == 0:
             raise serializers.ValidationError("Not enough books")
