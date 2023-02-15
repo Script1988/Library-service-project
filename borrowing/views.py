@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import mixins, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -51,7 +52,12 @@ class BorrowingView(
 
         return self.serializer_class
 
-    @action(methods=["post"], detail=True, url_path="return", url_name="return_borrowing")
+    @action(
+        methods=["post"],
+        detail=True,
+        url_path="return",
+        url_name="return_borrowing"
+    )
     def return_borrowing(self, request, pk=None):
 
         """Endpoint for borrowing returning"""
@@ -62,7 +68,10 @@ class BorrowingView(
 
         if serializer.is_valid():
             if borrowing.actual_return_date:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    serializer.errors,
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
             book.inventory += 1
             book.save()
@@ -71,3 +80,22 @@ class BorrowingView(
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "actual_return_date",
+                description="Shows all books, with None status",
+                type={"type": "list", "items": {"type": "None"}},
+            ),
+            OpenApiParameter(
+                "user_id",
+                description="Shows all borrowings of the concrete user, "
+                            "available only for admin",
+                type={"type": "list", "items": {"type": "int"}},
+            )
+        ]
+    )
+    # Created for documentation purpose
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)

@@ -69,7 +69,9 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
         request_user = self.get_count()
 
         if user.id != request_user:
-            raise serializers.ValidationError("You can not create borrowings for another users")
+            raise serializers.ValidationError(
+                "You can not create borrowings for another users"
+            )
 
         book = attrs["book_id"]
         if book.inventory == 0:
