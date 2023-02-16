@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.models import (
     AbstractUser,
     BaseUserManager,
@@ -48,3 +49,20 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     objects = UserManager()
+
+
+class Payment(models.Model):
+    amount = models.DecimalField(max_digits=4, decimal_places=2)
+    payment_date = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="payment",
+        null=True,
+    )
+
+    class Meta:
+        ordering = ["-payment_date"]
+
+    def __str__(self):
+        return f"{self.amount} was paid on {self.payment_date}"
