@@ -45,5 +45,3 @@ class PaymentView(
             return PaymentDetailSerializer
 
         return self.serializer_class
-
-
