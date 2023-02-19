@@ -44,9 +44,9 @@ class PaymentListSerializer(serializers.ModelSerializer):
 
     def get_count(self):
         request = self.context.get("request")
-        user_id = request.user.id
+        user = request.user.id
 
-        return user_id
+        return user
 
     def validate(self, attrs):
         user = attrs["user"]

@@ -34,7 +34,7 @@ def sample_borrowing(**params):
         "borrow_date": "2023-02-07",
         "expected_return_date": "2023-02-17",
         "actual_return_date": None,
-        "book_id": book,
+        "book": book,
     }
     default.update(params)
     return Borrowing.objects.create(**default)
@@ -64,7 +64,7 @@ class AuthenticatedBorrowingApiTests(TestCase):
         self.client.force_authenticate(self.user)
 
     def test_borrowings_list(self):
-        sample_borrowing(user_id=self.user)
+        sample_borrowing(user=self.user)
         result = self.client.get(BORROWING_URL)
         borrowings = Borrowing.objects.all()
         serializer = BorrowingListSerializer(borrowings, many=True)
@@ -73,7 +73,7 @@ class AuthenticatedBorrowingApiTests(TestCase):
         self.assertEqual(result.data, serializer.data)
 
     def test_retrieve_borrowing_detail(self):
-        borrowing = sample_borrowing(user_id=self.user)
+        borrowing = sample_borrowing(user=self.user)
         url = detail_url(borrowing.id)
         result = self.client.get(url)
 
@@ -86,13 +86,13 @@ class AuthenticatedBorrowingApiTests(TestCase):
             "borrow_date": "2023-02-07",
             "expected_return_date": "2023-02-17",
             "actual_return_date": "",
-            "user_id": self.user.id,
-            "book_id": sample_book().id,
+            "user": self.user.id,
+            "book": sample_book().id,
         }
 
         result = self.client.post(BORROWING_URL, payload)
         self.assertEqual(result.status_code, status.HTTP_201_CREATED)
-        book = Books.objects.get(pk=result.data["book_id"])
+        book = Books.objects.get(pk=result.data["book"])
         self.assertEqual(book.inventory, 2)
 
     def test_create_borrowing_with_invalid_data(self):
@@ -107,8 +107,8 @@ class AuthenticatedBorrowingApiTests(TestCase):
             "borrow_date": "2023-02-07",
             "expected_return_date": "2023-02-17",
             "actual_return_date": "",
-            "user_id": self.user.id,
-            "book_id": book.id,
+            "user": self.user.id,
+            "book": book.id,
         }
         result = self.client.post(BORROWING_URL, payload)
         self.assertNotEqual(result.status_code, status.HTTP_201_CREATED)
@@ -125,8 +125,8 @@ class AuthenticatedBorrowingApiTests(TestCase):
         borrowing = Borrowing.objects.create(
             borrow_date="2023-02-07",
             expected_return_date="2023-02-17",
-            user_id=self.user,
-            book_id=book
+            user=self.user,
+            book=book,
         )
 
         payload = {
@@ -141,8 +141,8 @@ class AuthenticatedBorrowingApiTests(TestCase):
             borrow_date="2023-02-07",
             expected_return_date="2023-02-17",
             actual_return_date="2023-02-27",
-            user_id=self.user,
-            book_id=sample_book()
+            user=self.user,
+            book=sample_book()
         )
         payload = {
             "actual_return_date": "2023-02-28"
@@ -150,28 +150,28 @@ class AuthenticatedBorrowingApiTests(TestCase):
         url = f"{BORROWING_URL}{borrowing.id}/return/"
         result = self.client.post(url, payload)
         self.assertEqual(result.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(borrowing.book_id.inventory, 3)
+        self.assertEqual(borrowing.book.inventory, 3)
 
     def test_filter_not_returned_borrowings(self):
         borrowing = Borrowing.objects.create(
             borrow_date="2023-02-07",
             expected_return_date="2023-02-17",
-            user_id=self.user,
-            book_id=sample_book()
+            user=self.user,
+            book=sample_book()
         )
         borrowing2 = Borrowing.objects.create(
             borrow_date="2023-02-07",
             expected_return_date="2023-02-17",
             actual_return_date="2023-02-27",
-            user_id=self.user,
-            book_id=sample_book()
+            user=self.user,
+            book=sample_book()
         )
         borrowing3 = Borrowing.objects.create(
             borrow_date="2023-02-07",
             expected_return_date="2023-02-17",
             actual_return_date="2023-02-22",
-            user_id=self.user,
-            book_id=sample_book()
+            user=self.user,
+            book=sample_book()
         )
 
         result = self.client.get(f"{BORROWING_URL}?actual_return_date=none")
@@ -192,11 +192,11 @@ class AuthenticatedBorrowingApiTests(TestCase):
         borrowing = Borrowing.objects.create(
             borrow_date="2023-12-07",
             expected_return_date="2023-12-17",
-            user_id=test_user,
-            book_id=sample_book()
+            user=test_user,
+            book=sample_book()
         )
 
-        result = self.client.get(f"{BORROWING_URL}?user_id={test_user.id}")
+        result = self.client.get(f"{BORROWING_URL}?user={test_user.id}")
         serializer = BorrowingListSerializer(borrowing)
         self.assertNotIn(serializer.data, result.data)
 
@@ -221,23 +221,23 @@ class AdminBorrowingApiTests(TestCase):
         borrowing = Borrowing.objects.create(
             borrow_date="2023-02-07",
             expected_return_date="2023-02-17",
-            user_id=self.user,
-            book_id=sample_book()
+            user=self.user,
+            book=sample_book()
         )
         borrowing2 = Borrowing.objects.create(
             borrow_date="2023-02-07",
             expected_return_date="2023-02-17",
             actual_return_date="2023-02-27",
-            user_id=self.user,
-            book_id=sample_book()
+            user=self.user,
+            book=sample_book()
         )
         borrowing3 = Borrowing.objects.create(
             borrow_date="2023-02-07",
             expected_return_date="2023-02-17",
-            user_id=test_user,
-            book_id=sample_book()
+            user=test_user,
+            book=sample_book()
         )
-        result = self.client.get(f"{BORROWING_URL}?user_id={self.user.id}")
+        result = self.client.get(f"{BORROWING_URL}?user={self.user.id}")
         serializer = BorrowingListSerializer(borrowing)
         serializer2 = BorrowingListSerializer(borrowing2)
         serializer3 = BorrowingListSerializer(borrowing3)

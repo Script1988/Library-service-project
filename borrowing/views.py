@@ -21,7 +21,7 @@ class BorrowingView(
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
-    queryset = Borrowing.objects.select_related("book_id", "user_id")
+    queryset = Borrowing.objects.select_related("book", "user")
     serializer_class = BorrowingCreateSerializer
     permission_classes = (IsAuthenticated,)
 
@@ -29,16 +29,16 @@ class BorrowingView(
         queryset = self.queryset
 
         if self.request.user.is_staff is False:
-            queryset = queryset.filter(user_id=self.request.user)
+            queryset = queryset.filter(user=self.request.user)
 
         is_active = self.request.query_params.get("actual_return_date")
-        user = self.request.query_params.get("user_id")
+        user = self.request.query_params.get("user")
 
         if is_active:
             queryset = queryset.filter(actual_return_date=None)
 
         if user and self.request.user.is_staff:
-            queryset = queryset.filter(user_id=int(user))
+            queryset = queryset.filter(user=int(user))
 
         return queryset
 
@@ -62,21 +62,14 @@ class BorrowingView(
 
         """Endpoint for borrowing returning"""
         borrowing = self.get_object()
-        book = borrowing.book_id
-
+        book = borrowing.book
         serializer = self.get_serializer(borrowing, data=request.data)
 
         if serializer.is_valid():
-            if borrowing.actual_return_date:
-                return Response(
-                    serializer.errors,
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
             book.inventory += 1
             book.save()
-
             serializer.save()
+
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -89,7 +82,7 @@ class BorrowingView(
                 type={"type": "list", "items": {"type": "None"}},
             ),
             OpenApiParameter(
-                "user_id",
+                "user",
                 description="Shows all borrowings of the concrete user, "
                             "available only for admin",
                 type={"type": "list", "items": {"type": "int"}},
