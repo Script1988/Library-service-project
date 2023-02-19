@@ -93,7 +93,7 @@ class BorrowingView(
                 description="Shows all borrowings of the concrete user, "
                             "available only for admin",
                 type={"type": "list", "items": {"type": "int"}},
-            )
+            ),
         ]
     )
     # Created for documentation purpose
