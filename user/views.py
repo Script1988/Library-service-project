@@ -45,3 +45,19 @@ class PaymentView(
             return PaymentDetailSerializer
 
         return self.serializer_class
+
+    def list(self, request, *args, **kwargs):
+        """Get all payments of the current user"""
+        return super(PaymentView, self).list(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        """Create a new payment"""
+        return super(PaymentView, self).create(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        """Get detailed payment information by id"""
+        return super(PaymentView, self).retrieve(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        """Delete payment by id"""
+        return super(PaymentView, self).destroy(request, *args, **kwargs)

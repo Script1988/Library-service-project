@@ -78,7 +78,7 @@ class BorrowingView(
         parameters=[
             OpenApiParameter(
                 "actual_return_date",
-                description="Shows all books, with None status",
+                description="Shows all books with None status",
                 type={"type": "list", "items": {"type": "None"}},
             ),
             OpenApiParameter(
@@ -92,3 +92,23 @@ class BorrowingView(
     # Created for documentation purpose
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        """Create a new borrowing"""
+        return super(BorrowingView, self).create(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        """Get detailed borrowing information by id"""
+        return super(BorrowingView, self).retrieve(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        """Update all information of the concrete borrowing"""
+        return super(BorrowingView, self).update(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        """Partial update of the concrete borrowing"""
+        return super(BorrowingView, self).partial_update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        """Delete borrowing by id"""
+        return super(BorrowingView, self).destroy(request, *args, **kwargs)
