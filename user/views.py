@@ -46,6 +46,7 @@ class PaymentView(
 
         return self.serializer_class
 
+    # Created for documentation purpose
     def list(self, request, *args, **kwargs):
         """Get all payments of the current user"""
         return super(PaymentView, self).list(request, *args, **kwargs)

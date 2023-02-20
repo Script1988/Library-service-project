@@ -22,6 +22,7 @@ class BooksViewSet(viewsets.ModelViewSet):
 
         return self.serializer_class
 
+    # Created for documentation purpose
     def list(self, request, *args, **kwargs):
         """List of all books in the library"""
         return super(BooksViewSet, self).list(request, *args, **kwargs)
